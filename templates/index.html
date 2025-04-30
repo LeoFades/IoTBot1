@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone Control Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --background-color: #f5f5f5;
+            --panel-color: #ffffff;
+            --text-color: #333333;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .dashboard-panel {
+            background-color: var(--panel-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .status-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .status-item {
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            flex: 1;
+            margin: 0 5px;
+            text-align: center;
+        }
+
+        .status-item h3 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: var(--primary-color);
+        }
+
+        .status-item p {
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .controls-section {
+            margin-top: 30px;
+        }
+
+        .controls-section h2 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .control-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .control-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .control-button:active {
+            transform: scale(0.95);
+        }
+
+        .empty {
+            visibility: hidden;
+        }
+
+        .toggle-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .toggle-label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .message-section {
+            margin-top: 20px;
+        }
+
+        .message-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .send-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+
+        .send-button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: #2ecc71;
+            color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 600px) {
+            .control-pad {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .status-indicator {
+                flex-direction: column;
+            }
+            
+            .status-item {
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Drone Control Dashboard</h1>
+            <p>Monitor and control your drone remotely</p>
+        </header>
+
+        <div class="dashboard-panel">
+            <div class="status-indicator">
+                <div class="status-item">
+                    <h3>Connection Status</h3>
+                    <p id="connection-status">Checking...</p>
+                </div>
+                <div class="status-item">
+                    <h3>Current Direction</h3>
+                    <p id="movement-status">Stopped</p>
+                </div>
+                <div class="status-item">
+                    <h3>Headlights</h3>
+                    <p id="headlights-status">Off</p>
+                </div>
+            </div>
+
+            <div class="controls-section">
+                <h2>Movement Controls</h2>
+                <div class="control-pad">
+                    <div class="empty"></div>
+                    <button class="control-button" id="forward">
+                        <i class="fas fa-arrow-up"></i> Forward
+                    </button>
+                    <div class="empty"></div>
+                    <button class="control-button" id="left">
+                        <i class="fas fa-arrow-left"></i> Left
+                    </button>
+                    <button class="control-button" id="stop">
+                        <i class="fas fa-stop"></i> Stop
+                    </button>
+                    <button class="control-button" id="right">
+                        <i class="fas fa-arrow-right"></i> Right
+                    </button>
+                    <div class="empty"></div>
+                    <button class="control-button" id="backward">
+                        <i class="fas fa-arrow-down"></i> Backward
+                    </button>
+                    <div class="empty"></div>
+                </div>
+
+                <div class="toggle-section">
+                    <span class="toggle-label">Headlights:</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="headlights-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="message-section">
+                    <h2>LCD Message</h2>
+                    <input type="text" class="message-input" id="lcd-message" placeholder="Enter message for LCD display" maxlength="20">
+                    <button class="send-button" id="send-message">Update LCD</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const connectionStatus = document.getElementById('connection-status');
+            const movementStatus = document.getElementById('movement-status');
+            const headlightsStatus = document.getElementById('headlights-status');
+            const headlightsToggle = document.getElementById('headlights-toggle');
+            const lcdMessageInput = document.getElementById('lcd-message');
+            const sendMessageBtn = document.getElementById('send-message');
+            const notification = document.getElementById('notification');
+            
+            // Movement control buttons
+            const forwardBtn = document.getElementById('forward');
+            const backwardBtn = document.getElementById('backward');
+            const leftBtn = document.getElementById('left');
+            const rightBtn = document.getElementById('right');
+            const stopBtn = document.getElementById('stop');
+            
+            // Initial load of control values
+            fetchControlValues();
+            
+            // Set up event listeners for control buttons
+            forwardBtn.addEventListener('click', () => updateMovement('forward'));
+            backwardBtn.addEventListener('click', () => updateMovement('backward'));
+            leftBtn.addEventListener('click', () => updateMovement('left'));
+            rightBtn.addEventListener('click', () => updateMovement('right'));
+            stopBtn.addEventListener('click', () => updateMovement('stop'));
+            
+            // Headlights toggle
+            headlightsToggle.addEventListener('change', function() {
+                const value = this.checked ? 'on' : 'off';
+                updateControl('headlights', value);
+            });
+            
+            // LCD message update
+            sendMessageBtn.addEventListener('click', function() {
+                const message = lcdMessageInput.value.trim();
+                if (message) {
+                    updateControl('lcd_message', message);
+                }
+            });
+            
+            // Helper function to update movement control
+            function updateMovement(direction) {
+                updateControl('movement', direction);
+            }
+            
+            // Update control function
+            function updateControl(controlName, value) {
+                fetch(`/api/control/${controlName}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ value: value })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update the UI based on the control type
+                        updateStatusDisplay(controlName, value);
+                        showNotification(`${controlName.replace('_', ' ')} updated to: ${value}`);
+                    } else {
+                        showNotification('Error: ' + data.error, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating control:', error);
+                    showNotification('Connection error', 'error');
+                    connectionStatus.textContent = 'Disconnected';
+                    connectionStatus.style.color = 'red';
+                });
+            }
+            
+            // Fetch current control values
+            function fetchControlValues() {
+                fetch('/api/controls')
+                .then(response => response.json())
+                .then(data => {
+                    connectionStatus.textContent = 'Connected';
+                    connectionStatus.style.color = 'green';
+                    
+                    // Update UI with current values
+                    data.forEach(item => {
+                        updateStatusDisplay(item.control_name, item.control_value);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching controls:', error);
+                    connectionStatus.textContent = 'Disconnected';
+                    connectionStatus.style.color = 'red';
+                });
+            }
+            
+            // Update status display
+            function updateStatusDisplay(controlName, value) {
+                switch(controlName) {
+                    case 'movement':
+                        movementStatus.textContent = value.charAt(0).toUpperCase() + value.slice(1);
+                        break;
+                    case 'headlights':
+                        headlightsStatus.textContent = value.charAt(0).toUpperCase() + value.slice(1);
+                        headlightsToggle.checked = value === 'on';
+                        break;
+                    case 'lcd_message':
+                        lcdMessageInput.value = value;
+                        break;
+                }
+            }
+            
+            // Show notification
+            function showNotification(message, type = 'success') {
+                notification.textContent = message;
+                notification.className = 'notification show';
+                
+                if (type === 'error') {
+                    notification.style.backgroundColor = '#e74c3c';
+                } else {
+                    notification.style.backgroundColor = '#2ecc71';
+                }
+                
+                setTimeout(() => {
+                    notification.className = 'notification';
+                }, 3000);
+            }
+            
+            // Refresh control values periodically
+            setInterval(fetchControlValues, 15000);
+        });
+    </script>
+</body>
+</html>
