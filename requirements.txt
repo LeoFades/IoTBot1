@@ -3,3 +3,6 @@ mysql-connector-python==8.1.0
 python-dotenv==1.0.0
 Werkzeug==2.3.7
 pyserial==3.5
+flask-socketio>=5.0.0
+opencv-python>=4.5.0
+eventlet>=0.30.0

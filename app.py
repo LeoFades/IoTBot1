@@ -3,6 +3,7 @@ import mysql.connector
 import json
 import os
 from dotenv import load_dotenv
+from webcam_stream import init_webcam_stream
 
 # Load environment variables
 load_dotenv()
@@ -110,5 +111,9 @@ def update_control(control_name):
     
     return jsonify({"error": "Database connection failed"}), 500
 
+# Initialize SocketIO and webcam streaming
+socketio, webcam_streamer = init_webcam_stream(app)
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    # Use socketio.run instead of app.run
+    socketio.run(app, debug=True, host='0.0.0.0', allow_unsafe_werkzeug=True)

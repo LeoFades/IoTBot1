@@ -1,0 +1,97 @@
+2025-05-02 01:30:37,641 - WebcamStream - INFO - WebcamStreamer initialized (camera_id=0, fps=20)
+2025-05-02 01:30:39,515 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.123:5000
+2025-05-02 01:30:39,516 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-02 01:30:39,516 - werkzeug - INFO -  * Restarting with stat
+2025-05-02 01:30:40,221 - WebcamStream - INFO - WebcamStreamer initialized (camera_id=0, fps=20)
+2025-05-02 01:30:40,222 - werkzeug - WARNING -  * Debugger is active!
+2025-05-02 01:30:40,228 - werkzeug - INFO -  * Debugger PIN: 100-974-281
+2025-05-02 01:30:48,144 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:30:48] "GET / HTTP/1.1" 200 -
+2025-05-02 01:30:48,306 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:30:48] "GET /socket.io/?EIO=4&transport=polling&t=PQCvgPf HTTP/1.1" 200 -
+2025-05-02 01:30:48,310 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:30:48] "GET /api/controls HTTP/1.1" 200 -
+2025-05-02 01:30:48,318 - WebcamStream - INFO - Client connected to webcam stream
+2025-05-02 01:30:48,321 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:30:48] "GET /socket.io/?EIO=4&transport=polling&t=PQCvgPx&sid=ELhGHbtwoSOoAMN3AAAA HTTP/1.1" 200 -
+2025-05-02 01:30:48,469 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:30:48] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-02 01:31:13,314 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:31:13] "GET /api/controls HTTP/1.1" 200 -
+2025-05-02 01:31:33,349 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:31:33] "GET /socket.io/?EIO=4&transport=websocket&sid=ELhGHbtwoSOoAMN3AAAA HTTP/1.1" 200 -
+2025-05-02 01:31:34,213 - WebcamStream - INFO - Webcam streaming started
+2025-05-02 01:31:34,213 - WebcamStream - INFO - Client disconnected from webcam stream
+2025-05-02 01:31:34,214 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:31:34] "POST /socket.io/?EIO=4&transport=polling&t=PQCvgPu&sid=ELhGHbtwoSOoAMN3AAAA HTTP/1.1" 200 -
+2025-05-02 01:31:35,350 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:31:35] "GET /socket.io/?EIO=4&transport=polling&t=PQCvrup HTTP/1.1" 200 -
+2025-05-02 01:31:35,357 - WebcamStream - INFO - Client connected to webcam stream
+2025-05-02 01:31:35,358 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:31:35] "POST /socket.io/?EIO=4&transport=polling&t=PQCvruv&sid=Mcpya5Gpsa1RWtSTAAAC HTTP/1.1" 200 -
+2025-05-02 01:31:35,360 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:31:35] "GET /socket.io/?EIO=4&transport=polling&t=PQCvruw&sid=Mcpya5Gpsa1RWtSTAAAC HTTP/1.1" 200 -
+2025-05-02 01:31:38,355 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:31:38] "GET /api/controls HTTP/1.1" 200 -
+2025-05-02 01:32:00,624 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:32:00] "POST /api/control/headlights HTTP/1.1" 200 -
+2025-05-02 01:32:01,948 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:32:01] "POST /api/control/headlights HTTP/1.1" 200 -
+2025-05-02 01:32:03,301 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:32:03] "GET /api/controls HTTP/1.1" 200 -
+2025-05-02 01:32:28,342 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:32:28] "GET /api/controls HTTP/1.1" 200 -
+2025-05-02 01:32:53,342 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:32:53] "GET /api/controls HTTP/1.1" 200 -
+2025-05-02 01:32:58,068 - werkzeug - INFO -  * Detected change in 'D:\\Work\\IoT\\IoTBot1\\webcam_stream.py', reloading
+2025-05-02 01:32:58,169 - werkzeug - INFO -  * Restarting with stat
+2025-05-02 01:32:58,955 - WebcamStream - INFO - WebcamStreamer initialized (camera_id=1, fps=20)
+2025-05-02 01:32:58,957 - werkzeug - WARNING -  * Debugger is active!
+2025-05-02 01:32:58,962 - werkzeug - INFO -  * Debugger PIN: 100-974-281
+2025-05-02 01:32:59,345 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:32:59] "GET /socket.io/?EIO=4&transport=polling&t=PQCwAPD HTTP/1.1" 200 -
+2025-05-02 01:32:59,355 - WebcamStream - INFO - Client connected to webcam stream
+2025-05-02 01:32:59,357 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:32:59] "GET /socket.io/?EIO=4&transport=polling&t=PQCwAPL&sid=zpkpwU3ch8J-g2eeAAAA HTTP/1.1" 200 -
+2025-05-02 01:32:59,533 - WebcamStream - ERROR - Could not open camera with ID 1
+2025-05-02 01:32:59,533 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:32:59] "POST /socket.io/?EIO=4&transport=polling&t=PQCwAPK&sid=zpkpwU3ch8J-g2eeAAAA HTTP/1.1" 200 -
+2025-05-02 01:33:11,632 - WebcamStream - INFO - WebcamStreamer initialized (camera_id=1, fps=20)
+2025-05-02 01:33:13,524 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.123:5000
+2025-05-02 01:33:13,525 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-02 01:33:13,525 - werkzeug - INFO -  * Restarting with stat
+2025-05-02 01:33:14,230 - WebcamStream - INFO - WebcamStreamer initialized (camera_id=1, fps=20)
+2025-05-02 01:33:14,232 - werkzeug - WARNING -  * Debugger is active!
+2025-05-02 01:33:14,237 - werkzeug - INFO -  * Debugger PIN: 100-974-281
+2025-05-02 01:33:14,260 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:33:14] "GET /socket.io/?EIO=4&transport=polling&t=PQCwDpv HTTP/1.1" 200 -
+2025-05-02 01:33:14,268 - WebcamStream - INFO - Client connected to webcam stream
+2025-05-02 01:33:14,271 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:33:14] "GET /socket.io/?EIO=4&transport=polling&t=PQCwE2N&sid=sF9qIGfp-TVYycCNAAAA HTTP/1.1" 200 -
+2025-05-02 01:33:14,427 - WebcamStream - ERROR - Could not open camera with ID 1
+2025-05-02 01:33:14,428 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:33:14] "POST /socket.io/?EIO=4&transport=polling&t=PQCwE2M&sid=sF9qIGfp-TVYycCNAAAA HTTP/1.1" 200 -
+2025-05-02 01:34:26,954 - WebcamStream - INFO - WebcamStreamer initialized (camera_id=0, fps=20)
+2025-05-02 01:34:28,848 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.123:5000
+2025-05-02 01:34:28,848 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-02 01:34:28,848 - werkzeug - INFO -  * Restarting with stat
+2025-05-02 01:34:29,550 - WebcamStream - INFO - WebcamStreamer initialized (camera_id=0, fps=20)
+2025-05-02 01:34:29,552 - werkzeug - WARNING -  * Debugger is active!
+2025-05-02 01:34:29,557 - werkzeug - INFO -  * Debugger PIN: 100-974-281
+2025-05-02 01:34:32,351 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:34:32] "GET /socket.io/?EIO=4&transport=polling&t=PQCwX6R HTTP/1.1" 200 -
+2025-05-02 01:34:32,361 - WebcamStream - INFO - Client connected to webcam stream
+2025-05-02 01:34:32,363 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:34:32] "GET /socket.io/?EIO=4&transport=polling&t=PQCwX6Y&sid=0bbeR9KQ4BD1cgToAAAA HTTP/1.1" 200 -
+2025-05-02 01:34:40,780 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:34:40] "GET / HTTP/1.1" 200 -
+2025-05-02 01:34:40,857 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:34:40] "GET /socket.io/?EIO=4&transport=polling&t=PQCwZBA HTTP/1.1" 200 -
+2025-05-02 01:34:40,861 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:34:40] "GET /api/controls HTTP/1.1" 200 -
+2025-05-02 01:34:40,956 - WebcamStream - INFO - Client connected to webcam stream
+2025-05-02 01:34:40,960 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:34:40] "GET /socket.io/?EIO=4&transport=polling&t=PQCwZCN&sid=tOmEUOhRNLiA8QPHAAAC HTTP/1.1" 200 -
+2025-05-02 01:34:47,556 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:34:47] "GET /api/controls HTTP/1.1" 200 -
+2025-05-02 01:34:49,357 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:34:49] "GET /socket.io/?EIO=4&transport=websocket&sid=0bbeR9KQ4BD1cgToAAAA HTTP/1.1" 200 -
+2025-05-02 01:35:05,856 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:35:05] "GET /api/controls HTTP/1.1" 200 -
+2025-05-02 01:35:26,346 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:35:26] "GET /socket.io/?EIO=4&transport=websocket&sid=tOmEUOhRNLiA8QPHAAAC HTTP/1.1" 200 -
+2025-05-02 01:35:27,338 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:35:27] "GET /socket.io/?EIO=4&transport=polling&t=PQCwkXd HTTP/1.1" 200 -
+2025-05-02 01:35:27,344 - WebcamStream - INFO - Client connected to webcam stream
+2025-05-02 01:35:27,347 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:35:27] "GET /socket.io/?EIO=4&transport=polling&t=PQCwkXj&sid=3ubcvsB5BkTKQtyGAAAE HTTP/1.1" 200 -
+2025-05-02 01:35:31,341 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:35:31] "GET /api/controls HTTP/1.1" 200 -
+2025-05-02 01:35:31,845 - WebcamStream - INFO - Webcam streaming started
+2025-05-02 01:35:31,845 - WebcamStream - INFO - Client disconnected from webcam stream
+2025-05-02 01:35:31,846 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:35:31] "POST /socket.io/?EIO=4&transport=polling&t=PQCwX6X&sid=0bbeR9KQ4BD1cgToAAAA HTTP/1.1" 200 -
+2025-05-02 01:35:39,071 - WebcamStream - INFO - Client disconnected from webcam stream
+2025-05-02 01:35:41,856 - WebcamStream - WARNING - Failed to capture frame
+2025-05-02 01:35:50,355 - WebcamStream - INFO - Webcam streaming started
+2025-05-02 01:35:50,356 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:35:50] "POST /socket.io/?EIO=4&transport=polling&t=PQCwZCK&sid=tOmEUOhRNLiA8QPHAAAC HTTP/1.1" 200 -
+2025-05-02 01:35:52,225 - WebcamStream - WARNING - Failed to capture frame
+2025-05-02 01:35:56,340 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:35:56] "GET /api/controls HTTP/1.1" 200 -
+2025-05-02 01:36:01,307 - WebcamStream - INFO - Webcam streaming started
+2025-05-02 01:36:01,307 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:36:01] "POST /socket.io/?EIO=4&transport=polling&t=PQCwkXi&sid=3ubcvsB5BkTKQtyGAAAE HTTP/1.1" 200 -
+2025-05-02 01:36:02,334 - WebcamStream - WARNING - Failed to capture frame
+2025-05-02 01:36:21,341 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:36:21] "GET /api/controls HTTP/1.1" 200 -
+2025-05-02 01:37:02,353 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:37:02] "GET /api/controls HTTP/1.1" 200 -
+2025-05-02 01:38:02,355 - werkzeug - INFO - 192.168.0.123 - - [02/May/2025 01:38:02] "GET /api/controls HTTP/1.1" 200 -

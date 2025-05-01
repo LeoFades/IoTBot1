@@ -256,6 +256,32 @@
                 margin: 5px 0;
             }
         }
+
+        .webcam-section {
+        margin-top: 30px;
+    }
+    
+    .webcam-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    #webcam-feed {
+        width: 100%;
+        max-width: 640px;
+        height: auto;
+        border-radius: var(--border-radius);
+        border: 1px solid #ddd;
+        background-color: #f8f8f8;
+    }
+    
+    .webcam-controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
     </style>
 </head>
 <body>
@@ -282,6 +308,21 @@
                 <div class="status-item">
                     <h3>Headlights</h3>
                     <p id="headlights-status">Off</p>
+                </div>
+            </div>
+
+            <div class="webcam-section">
+                <h2>Live Camera Feed</h2>
+                <div class="webcam-container">
+                    <img id="webcam-feed" src="" alt="Loading webcam feed...">
+                    <div class="webcam-controls">
+                        <button class="control-button" id="start-stream">
+                            <i class="fas fa-play"></i> Start Stream
+                        </button>
+                        <button class="control-button" id="stop-stream">
+                            <i class="fas fa-stop"></i> Stop Stream
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -535,6 +576,63 @@
             
             // Refresh control values periodically
             setInterval(fetchControlValues, 25000);
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        // Webcam streaming code
+        document.addEventListener('DOMContentLoaded', function() {
+            const webcamFeed = document.getElementById('webcam-feed');
+            const startStreamBtn = document.getElementById('start-stream');
+            const stopStreamBtn = document.getElementById('stop-stream');
+            
+            // Connect to Socket.IO server
+            const socket = io();
+            let streamActive = false;
+            
+            // Handle connection events
+            socket.on('connect', function() {
+                console.log('Connected to webcam stream server');
+                connectionStatus.textContent = 'Connected';
+                connectionStatus.style.color = 'green';
+            });
+            
+            socket.on('disconnect', function() {
+                console.log('Disconnected from webcam stream server');
+                streamActive = false;
+                webcamFeed.src = '';
+                webcamFeed.alt = 'Stream disconnected';
+            });
+            
+            // Handle webcam frames
+            socket.on('webcam_frame', function(data) {
+                if (streamActive) {
+                    webcamFeed.src = 'data:image/jpeg;base64,' + data.image;
+                }
+            });
+            
+            // Start stream button
+            startStreamBtn.addEventListener('click', function() {
+                socket.emit('start_stream', {}, function(response) {
+                    if (response.success) {
+                        streamActive = true;
+                        webcamFeed.alt = 'Live webcam feed';
+                        showNotification('Webcam stream started');
+                    } else {
+                        showNotification('Failed to start webcam stream', 'error');
+                    }
+                });
+            });
+            
+            // Stop stream button
+            stopStreamBtn.addEventListener('click', function() {
+                socket.emit('stop_stream', {}, function(response) {
+                    streamActive = false;
+                    webcamFeed.src = '';
+                    webcamFeed.alt = 'Stream stopped';
+                    showNotification('Webcam stream stopped');
+                });
+            });
         });
     </script>
 </body>
