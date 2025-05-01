@@ -48,7 +48,8 @@ def initialize_db():
         
         if count == 0:
             default_controls = [
-                ('movement', 'stop'),
+                ('drive_motor', 'stop'),
+                ('steering', 'center'),
                 ('headlights', 'off'),
                 ('lcd_message', 'Hello Drone!')
             ]

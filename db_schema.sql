@@ -11,14 +11,22 @@ CREATE TABLE IF NOT EXISTS drone_controls (
 );
 
 -- Insert default values if not already present
+-- Drive motor control (forward, backward, stop)
 INSERT INTO drone_controls (control_name, control_value)
-SELECT 'movement', 'stop'
-WHERE NOT EXISTS (SELECT 1 FROM drone_controls WHERE control_name = 'movement');
+SELECT 'drive_motor', 'stop'
+WHERE NOT EXISTS (SELECT 1 FROM drone_controls WHERE control_name = 'drive_motor');
 
+-- Steering control (left, center, right)
+INSERT INTO drone_controls (control_name, control_value)
+SELECT 'steering', 'center'
+WHERE NOT EXISTS (SELECT 1 FROM drone_controls WHERE control_name = 'steering');
+
+-- Headlights control
 INSERT INTO drone_controls (control_name, control_value)
 SELECT 'headlights', 'off'
 WHERE NOT EXISTS (SELECT 1 FROM drone_controls WHERE control_name = 'headlights');
 
+-- LCD message
 INSERT INTO drone_controls (control_name, control_value)
 SELECT 'lcd_message', 'Hello Drone!'
 WHERE NOT EXISTS (SELECT 1 FROM drone_controls WHERE control_name = 'lcd_message');

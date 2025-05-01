@@ -51,6 +51,7 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 15px;
+            flex-wrap: wrap;
         }
 
         .status-item {
@@ -58,8 +59,9 @@
             padding: 10px 15px;
             border-radius: var(--border-radius);
             flex: 1;
-            margin: 0 5px;
+            margin: 5px;
             text-align: center;
+            min-width: 120px;
         }
 
         .status-item h3 {
@@ -83,11 +85,35 @@
             margin-bottom: 15px;
         }
 
-        .control-pad {
+        .control-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .control-group h3 {
+            margin-top: 0;
+            color: var(--secondary-color);
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .drive-control {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .steering-control {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            margin-bottom: 20px;
         }
 
         .control-button {
@@ -112,8 +138,8 @@
             transform: scale(0.95);
         }
 
-        .empty {
-            visibility: hidden;
+        .control-button.active {
+            background-color: #27ae60;
         }
 
         .toggle-section {
@@ -218,8 +244,8 @@
         }
 
         @media (max-width: 600px) {
-            .control-pad {
-                grid-template-columns: repeat(3, 1fr);
+            .control-container {
+                flex-direction: column;
             }
             
             .status-indicator {
@@ -246,8 +272,12 @@
                     <p id="connection-status">Checking...</p>
                 </div>
                 <div class="status-item">
-                    <h3>Current Direction</h3>
-                    <p id="movement-status">Stopped</p>
+                    <h3>Drive Motor</h3>
+                    <p id="drive-motor-status">Stopped</p>
+                </div>
+                <div class="status-item">
+                    <h3>Steering</h3>
+                    <p id="steering-status">Center</p>
                 </div>
                 <div class="status-item">
                     <h3>Headlights</h3>
@@ -256,27 +286,40 @@
             </div>
 
             <div class="controls-section">
-                <h2>Movement Controls</h2>
-                <div class="control-pad">
-                    <div class="empty"></div>
-                    <button class="control-button" id="forward">
-                        <i class="fas fa-arrow-up"></i> Forward
-                    </button>
-                    <div class="empty"></div>
-                    <button class="control-button" id="left">
-                        <i class="fas fa-arrow-left"></i> Left
-                    </button>
-                    <button class="control-button" id="stop">
-                        <i class="fas fa-stop"></i> Stop
-                    </button>
-                    <button class="control-button" id="right">
-                        <i class="fas fa-arrow-right"></i> Right
-                    </button>
-                    <div class="empty"></div>
-                    <button class="control-button" id="backward">
-                        <i class="fas fa-arrow-down"></i> Backward
-                    </button>
-                    <div class="empty"></div>
+                <h2>Drone Controls</h2>
+                
+                <div class="control-container">
+                    <!-- Drive Motor Controls -->
+                    <div class="control-group">
+                        <h3>Drive Motor</h3>
+                        <div class="drive-control">
+                            <button class="control-button" id="drive-forward">
+                                <i class="fas fa-arrow-up"></i> Forward
+                            </button>
+                            <button class="control-button active" id="drive-stop">
+                                <i class="fas fa-stop"></i> Stop
+                            </button>
+                            <button class="control-button" id="drive-backward">
+                                <i class="fas fa-arrow-down"></i> Backward
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Steering Controls -->
+                    <div class="control-group">
+                        <h3>Steering</h3>
+                        <div class="steering-control">
+                            <button class="control-button" id="steer-left">
+                                <i class="fas fa-arrow-left"></i> Left
+                            </button>
+                            <button class="control-button active" id="steer-center">
+                                <i class="fas fa-align-center"></i> Center
+                            </button>
+                            <button class="control-button" id="steer-right">
+                                <i class="fas fa-arrow-right"></i> Right
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="toggle-section">
@@ -301,29 +344,58 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const connectionStatus = document.getElementById('connection-status');
-            const movementStatus = document.getElementById('movement-status');
+            const driveMotorStatus = document.getElementById('drive-motor-status');
+            const steeringStatus = document.getElementById('steering-status');
             const headlightsStatus = document.getElementById('headlights-status');
             const headlightsToggle = document.getElementById('headlights-toggle');
             const lcdMessageInput = document.getElementById('lcd-message');
             const sendMessageBtn = document.getElementById('send-message');
             const notification = document.getElementById('notification');
             
-            // Movement control buttons
-            const forwardBtn = document.getElementById('forward');
-            const backwardBtn = document.getElementById('backward');
-            const leftBtn = document.getElementById('left');
-            const rightBtn = document.getElementById('right');
-            const stopBtn = document.getElementById('stop');
+            // Drive motor control buttons
+            const driveForwardBtn = document.getElementById('drive-forward');
+            const driveStopBtn = document.getElementById('drive-stop');
+            const driveBackwardBtn = document.getElementById('drive-backward');
+            
+            // Steering control buttons
+            const steerLeftBtn = document.getElementById('steer-left');
+            const steerCenterBtn = document.getElementById('steer-center');
+            const steerRightBtn = document.getElementById('steer-right');
             
             // Initial load of control values
             fetchControlValues();
             
-            // Set up event listeners for control buttons
-            forwardBtn.addEventListener('click', () => updateMovement('forward'));
-            backwardBtn.addEventListener('click', () => updateMovement('backward'));
-            leftBtn.addEventListener('click', () => updateMovement('left'));
-            rightBtn.addEventListener('click', () => updateMovement('right'));
-            stopBtn.addEventListener('click', () => updateMovement('stop'));
+            // Set up event listeners for drive motor buttons
+            driveForwardBtn.addEventListener('click', () => {
+                updateDriveMotor('forward');
+                updateActiveButton('drive', 'forward');
+            });
+            
+            driveStopBtn.addEventListener('click', () => {
+                updateDriveMotor('stop');
+                updateActiveButton('drive', 'stop');
+            });
+            
+            driveBackwardBtn.addEventListener('click', () => {
+                updateDriveMotor('backward');
+                updateActiveButton('drive', 'backward');
+            });
+            
+            // Set up event listeners for steering buttons
+            steerLeftBtn.addEventListener('click', () => {
+                updateSteering('left');
+                updateActiveButton('steer', 'left');
+            });
+            
+            steerCenterBtn.addEventListener('click', () => {
+                updateSteering('center');
+                updateActiveButton('steer', 'center');
+            });
+            
+            steerRightBtn.addEventListener('click', () => {
+                updateSteering('right');
+                updateActiveButton('steer', 'right');
+            });
             
             // Headlights toggle
             headlightsToggle.addEventListener('change', function() {
@@ -339,9 +411,36 @@
                 }
             });
             
-            // Helper function to update movement control
-            function updateMovement(direction) {
-                updateControl('movement', direction);
+            // Helper function to update drive motor control
+            function updateDriveMotor(direction) {
+                updateControl('drive_motor', direction);
+            }
+            
+            // Helper function to update steering control
+            function updateSteering(direction) {
+                updateControl('steering', direction);
+            }
+            
+            // Update active button visuals
+            function updateActiveButton(type, value) {
+                let buttons;
+                
+                if (type === 'drive') {
+                    buttons = [driveForwardBtn, driveStopBtn, driveBackwardBtn];
+                    buttons.forEach(btn => btn.classList.remove('active'));
+                    
+                    if (value === 'forward') driveForwardBtn.classList.add('active');
+                    else if (value === 'stop') driveStopBtn.classList.add('active');
+                    else if (value === 'backward') driveBackwardBtn.classList.add('active');
+                }
+                else if (type === 'steer') {
+                    buttons = [steerLeftBtn, steerCenterBtn, steerRightBtn];
+                    buttons.forEach(btn => btn.classList.remove('active'));
+                    
+                    if (value === 'left') steerLeftBtn.classList.add('active');
+                    else if (value === 'center') steerCenterBtn.classList.add('active');
+                    else if (value === 'right') steerRightBtn.classList.add('active');
+                }
             }
             
             // Update control function
@@ -382,6 +481,14 @@
                     // Update UI with current values
                     data.forEach(item => {
                         updateStatusDisplay(item.control_name, item.control_value);
+                        
+                        // Update active button visuals
+                        if (item.control_name === 'drive_motor') {
+                            updateActiveButton('drive', item.control_value);
+                        }
+                        else if (item.control_name === 'steering') {
+                            updateActiveButton('steer', item.control_value);
+                        }
                     });
                 })
                 .catch(error => {
@@ -394,8 +501,11 @@
             // Update status display
             function updateStatusDisplay(controlName, value) {
                 switch(controlName) {
-                    case 'movement':
-                        movementStatus.textContent = value.charAt(0).toUpperCase() + value.slice(1);
+                    case 'drive_motor':
+                        driveMotorStatus.textContent = value.charAt(0).toUpperCase() + value.slice(1);
+                        break;
+                    case 'steering':
+                        steeringStatus.textContent = value.charAt(0).toUpperCase() + value.slice(1);
                         break;
                     case 'headlights':
                         headlightsStatus.textContent = value.charAt(0).toUpperCase() + value.slice(1);
@@ -424,7 +534,7 @@
             }
             
             // Refresh control values periodically
-            setInterval(fetchControlValues, 15000);
+            setInterval(fetchControlValues, 25000);
         });
     </script>
 </body>
