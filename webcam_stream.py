@@ -138,14 +138,14 @@ def init_webcam_stream(app):
         # Keep streaming in case other clients are still connected
     
     @socketio.on('start_stream')
-    def handle_start_stream():
+    def handle_start_stream(data=None):
         if not streamer.running:
             success = streamer.start()
             return {'success': success}
         return {'success': True}
     
     @socketio.on('stop_stream')
-    def handle_stop_stream():
+    def handle_stop_stream(data=None):
         if streamer.running:
             streamer.stop()
             return {'success': True}
