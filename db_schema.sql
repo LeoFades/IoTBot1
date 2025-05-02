@@ -34,3 +34,28 @@ WHERE NOT EXISTS (SELECT 1 FROM drone_controls WHERE control_name = 'lcd_message
 -- Create a sample database user with appropriate permissions
 -- GRANT ALL PRIVILEGES ON drone_db.* TO 'drone_user'@'localhost' IDENTIFIED BY 'your_password';
 -- FLUSH PRIVILEGES;
+
+CREATE TABLE IF NOT EXISTS sensor_readings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    reading_type VARCHAR(50) NOT NULL,
+    reading_value FLOAT NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_reading_type (reading_type),
+    INDEX idx_timestamp (timestamp)
+);
+
+CREATE OR REPLACE VIEW hourly_sensor_averages AS
+SELECT 
+    reading_type,
+    DATE_FORMAT(timestamp, '%Y-%m-%d %H:00:00') AS hour_bucket,
+    AVG(reading_value) AS average_value,
+    MIN(reading_value) AS min_value,
+    MAX(reading_value) AS max_value,
+    COUNT(*) AS reading_count
+FROM 
+    sensor_readings
+GROUP BY 
+    reading_type, hour_bucket
+ORDER BY 
+    hour_bucket DESC, reading_type;
+

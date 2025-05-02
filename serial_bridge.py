@@ -295,5 +295,141 @@ def main():
             time.sleep(1)  # Prevent tight error loop
 
 
+#SENSORRRR
+def update_sensor_data(sensor_data):
+    """Parse sensor data and update in database"""
+    if not sensor_data.startswith("SENSORS:"):
+        return
+    
+    # Parse sensor data format: "SENSORS:DIST=20;LIGHT=300"
+    try:
+        data_parts = sensor_data[8:].split(';')  # Remove "SENSORS:" prefix
+        parsed_data = {}
+        
+        for part in data_parts:
+            if '=' in part:
+                key, value = part.split('=')
+                parsed_data[key] = value
+        
+        # Log the sensor values
+        logger.info(f"Received sensor data: {parsed_data}")
+        
+        # Store sensor data in the database
+        conn = get_db_connection()
+        if conn:
+            cursor = conn.cursor()
+            
+            # Insert each sensor reading as a separate row
+            for sensor_type, sensor_value in parsed_data.items():
+                try:
+                    # Convert the sensor value to float
+                    float_value = float(sensor_value)
+                    
+                    cursor.execute(
+                        "INSERT INTO sensor_readings (reading_type, reading_value) VALUES (%s, %s)",
+                        (sensor_type, float_value)
+                    )
+                except ValueError:
+                    logger.warning(f"Could not convert sensor value to float: {sensor_type}={sensor_value}")
+            
+            conn.commit()
+            cursor.close()
+            conn.close()
+            
+    except Exception as e:
+        logger.error(f"Error parsing sensor data: {e}")
+
+# You'll also need to add a function to get sensor analytics for the dashboard
+def get_sensor_analytics(timeframe='24h'):
+    """
+    Get sensor analytics for the dashboard
+    timeframe can be '1h', '24h', '7d', etc.
+    """
+    conn = get_db_connection()
+    if not conn:
+        return None
+    
+    try:
+        cursor = conn.cursor(dictionary=True)
+        
+        # Calculate the time boundary based on the timeframe
+        if timeframe == '1h':
+            time_sql = "timestamp >= DATE_SUB(NOW(), INTERVAL 1 HOUR)"
+        elif timeframe == '24h':
+            time_sql = "timestamp >= DATE_SUB(NOW(), INTERVAL 24 HOUR)"
+        elif timeframe == '7d':
+            time_sql = "timestamp >= DATE_SUB(NOW(), INTERVAL 7 DAY)"
+        else:
+            time_sql = "timestamp >= DATE_SUB(NOW(), INTERVAL 24 HOUR)"  # Default to 24h
+        
+        # Get summary stats for each sensor type
+        cursor.execute(f"""
+            SELECT 
+                reading_type, 
+                AVG(reading_value) AS avg_value,
+                MIN(reading_value) AS min_value,
+                MAX(reading_value) AS max_value,
+                COUNT(*) AS reading_count
+            FROM 
+                sensor_readings
+            WHERE 
+                {time_sql}
+            GROUP BY 
+                reading_type
+        """)
+        
+        summary_stats = cursor.fetchall()
+        
+        # Get time series data for charts (hourly averages)
+        cursor.execute(f"""
+            SELECT 
+                reading_type,
+                DATE_FORMAT(timestamp, '%Y-%m-%d %H:00:00') AS hour_bucket,
+                AVG(reading_value) AS avg_value
+            FROM 
+                sensor_readings
+            WHERE 
+                {time_sql}
+            GROUP BY 
+                reading_type, hour_bucket
+            ORDER BY 
+                hour_bucket
+        """)
+        
+        time_series = cursor.fetchall()
+        
+        # Get operation stats based on control changes
+        cursor.execute(f"""
+            SELECT 
+                control_name,
+                control_value,
+                COUNT(*) AS change_count
+            FROM 
+                drone_controls_history
+            WHERE 
+                updated_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+            GROUP BY 
+                control_name, control_value
+            ORDER BY 
+                control_name, change_count DESC
+        """)
+        
+        operation_stats = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return {
+            'summary': summary_stats,
+            'time_series': time_series,
+            'operations': operation_stats
+        }
+        
+    except mysql.connector.Error as err:
+        logger.error(f"Error getting sensor analytics: {err}")
+        if conn:
+            conn.close()
+        return None
+
 if __name__ == "__main__":
     main()

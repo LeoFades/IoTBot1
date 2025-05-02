@@ -4,6 +4,7 @@ import json
 import os
 from dotenv import load_dotenv
 from webcam_stream import init_webcam_stream
+from datetime import datetime, timedelta
 
 # Load environment variables
 load_dotenv()
@@ -110,6 +111,78 @@ def update_control(control_name):
         return jsonify({"success": True, "control": control_name, "value": new_value})
     
     return jsonify({"error": "Database connection failed"}), 500
+
+@app.route('/api/sensor_analytics', methods=['GET'])
+def get_sensor_analytics():
+    """API endpoint to get sensor analytics data"""
+    timeframe = request.args.get('timeframe', '24h')
+    
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"error": "Database connection failed"}), 500
+    
+    try:
+        cursor = conn.cursor(dictionary=True)
+        
+        # Calculate the time boundary based on the timeframe
+        if timeframe == '1h':
+            time_sql = "timestamp >= DATE_SUB(NOW(), INTERVAL 1 HOUR)"
+        elif timeframe == '24h':
+            time_sql = "timestamp >= DATE_SUB(NOW(), INTERVAL 24 HOUR)"
+        elif timeframe == '7d':
+            time_sql = "timestamp >= DATE_SUB(NOW(), INTERVAL 7 DAY)"
+        else:
+            time_sql = "timestamp >= DATE_SUB(NOW(), INTERVAL 24 HOUR)"  # Default to 24h
+        
+        # Get summary stats for each sensor type
+        cursor.execute(f"""
+            SELECT 
+                reading_type, 
+                AVG(reading_value) AS avg_value,
+                MIN(reading_value) AS min_value,
+                MAX(reading_value) AS max_value,
+                COUNT(*) AS reading_count
+            FROM 
+                sensor_readings
+            WHERE 
+                {time_sql}
+            GROUP BY 
+                reading_type
+        """)
+        
+        summary_stats = cursor.fetchall()
+        
+        # Get time series data for charts (hourly averages)
+        cursor.execute(f"""
+            SELECT 
+                reading_type,
+                DATE_FORMAT(timestamp, '%Y-%m-%d %H:00:00') AS hour_bucket,
+                AVG(reading_value) AS avg_value
+            FROM 
+                sensor_readings
+            WHERE 
+                {time_sql}
+            GROUP BY 
+                reading_type, hour_bucket
+            ORDER BY 
+                hour_bucket
+        """)
+        
+        time_series = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            'summary': summary_stats,
+            'time_series': time_series
+        })
+        
+    except mysql.connector.Error as err:
+        print(f"Error getting sensor analytics: {err}")
+        if conn:
+            conn.close()
+        return jsonify({"error": f"Database error: {str(err)}"}), 500
 
 # Initialize SocketIO and webcam streaming
 socketio, webcam_streamer = init_webcam_stream(app)

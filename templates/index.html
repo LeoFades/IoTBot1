@@ -6,289 +6,215 @@
     <title>Drone Control Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #3498db;
-            --secondary-color: #2980b9;
-            --background-color: #f5f5f5;
-            --panel-color: #ffffff;
-            --text-color: #333333;
-            --border-radius: 8px;
-            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
+/* Basic reset and page setup */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 10px;
+    line-height: 1.4;
+}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--background-color);
-            margin: 0;
-            padding: 20px;
-            color: var(--text-color);
-        }
+/* Container */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+/* Headings */
+h1, h2, h3, h4 {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
 
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+/* Dashboard panels */
+.dashboard-panel {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 15px;
+}
 
-        h1 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
+/* Status indicators */
+.status-indicator {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
 
-        .dashboard-panel {
-            background-color: var(--panel-color);
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
+.status-item {
+    border: 1px solid #ddd;
+    padding: 5px;
+    min-width: 100px;
+}
 
-        .status-indicator {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
+/* Control sections */
+.control-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
 
-        .status-item {
-            background-color: rgba(52, 152, 219, 0.1);
-            padding: 10px 15px;
-            border-radius: var(--border-radius);
-            flex: 1;
-            margin: 5px;
-            text-align: center;
-            min-width: 120px;
-        }
+.control-group {
+    flex: 1;
+    min-width: 200px;
+}
 
-        .status-item h3 {
-            margin-top: 0;
-            margin-bottom: 5px;
-            font-size: 14px;
-            color: var(--primary-color);
-        }
+.drive-control, .steering-control {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
 
-        .status-item p {
-            margin: 0;
-            font-weight: bold;
-        }
+.steering-control {
+    flex-direction: row;
+}
 
-        .controls-section {
-            margin-top: 30px;
-        }
+/* Buttons */
+.control-button {
+    padding: 5px;
+    border: 1px solid #999;
+    background-color: #f8f8f8;
+    cursor: pointer;
+}
 
-        .controls-section h2 {
-            color: var(--secondary-color);
-            margin-bottom: 15px;
-        }
+.control-button.active {
+    background-color: #ddd;
+    font-weight: bold;
+}
 
-        .control-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+.send-button {
+    padding: 5px;
+    border: 1px solid #999;
+    background-color: #f8f8f8;
+}
 
-        .control-group {
-            flex: 1;
-            min-width: 280px;
-        }
+/* Toggle switch - simplified */
+.toggle-section {
+    margin-bottom: 10px;
+}
 
-        .control-group h3 {
-            margin-top: 0;
-            color: var(--secondary-color);
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
 
-        .drive-control {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-        }
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
 
-        .steering-control {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
+.slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border: 1px solid #999;
+}
 
-        .control-button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border: 1px solid #999;
+}
 
-        .control-button:hover {
-            background-color: var(--secondary-color);
-        }
+input:checked + .slider {
+    background-color: #ddd;
+}
 
-        .control-button:active {
-            transform: scale(0.95);
-        }
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
 
-        .control-button.active {
-            background-color: #27ae60;
-        }
+/* Message input */
+.message-input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #999;
+    margin-bottom: 5px;
+}
 
-        .toggle-section {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+/* Notification */
+.notification {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 10px;
+    border: 1px solid #999;
+    background-color: #f8f8f8;
+    opacity: 0;
+}
 
-        .toggle-label {
-            margin-right: 10px;
-            font-weight: bold;
-        }
+.notification.show {
+    opacity: 1;
+}
 
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
+/* Webcam feed */
+#webcam-feed {
+    width: 100%;
+    max-width: 640px;
+    border: 1px solid #ddd;
+}
 
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+.webcam-controls {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+}
 
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
+/* Analytics section */
+.analytics-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
 
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
+.analytics-summary, .analytics-chart {
+    flex: 1;
+    min-width: 280px;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
 
-        input:checked + .slider {
-            background-color: var(--primary-color);
-        }
+.summary-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
+.sensor-summary-item {
+    border: 1px solid #ddd;
+    padding: 5px;
+}
 
-        .message-section {
-            margin-top: 20px;
-        }
+#sensor-chart-container {
+    height: 300px;
+    width: 100%;
+}
 
-        .message-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-
-        .send-button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.2s;
-        }
-
-        .send-button:hover {
-            background-color: var(--secondary-color);
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            background-color: #2ecc71;
-            color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .notification.show {
-            opacity: 1;
-        }
-
-        @media (max-width: 600px) {
-            .control-container {
-                flex-direction: column;
-            }
-            
-            .status-indicator {
-                flex-direction: column;
-            }
-            
-            .status-item {
-                margin: 5px 0;
-            }
-        }
-
-        .webcam-section {
-        margin-top: 30px;
-    }
-    
-    .webcam-container {
-        display: flex;
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .control-container, .status-indicator, .analytics-container {
         flex-direction: column;
-        align-items: center;
-        margin-bottom: 20px;
     }
-    
-    #webcam-feed {
-        width: 100%;
-        max-width: 640px;
-        height: auto;
-        border-radius: var(--border-radius);
-        border: 1px solid #ddd;
-        background-color: #f8f8f8;
-    }
-    
-    .webcam-controls {
-        display: flex;
-        gap: 10px;
-        margin-top: 10px;
-    }
+}
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Drone Control Dashboard</h1>
-            <p>Monitor and control your drone remotely</p>
+            <h1>Bondbot Dashboard</h1>
+            <p>Done by Leonardo Liew 102781996</p>
         </header>
 
         <div class="dashboard-panel">
@@ -377,6 +303,37 @@
                     <button class="send-button" id="send-message">Update LCD</button>
                 </div>
             </div>
+
+            <!-- Add this right after the controls-section div, before the closing </div> of dashboard-panel -->
+
+<div class="analytics-section">
+    <h2>Sensor Analytics</h2>
+    
+    <div class="timeframe-selector">
+        <span>Timeframe:</span>
+        <select id="timeframe-select">
+            <option value="1h">Last Hour</option>
+            <option value="24h" selected>Last 24 Hours</option>
+            <option value="7d">Last 7 Days</option>
+        </select>
+    </div>
+    
+    <div class="analytics-container">
+        <div class="analytics-summary">
+            <h3>Sensor Summary</h3>
+            <div id="sensor-summary" class="summary-container">
+                <p>Loading sensor data...</p>
+            </div>
+        </div>
+        
+        <div class="analytics-chart">
+            <h3>Sensor Readings Over Time</h3>
+            <div id="sensor-chart-container">
+                <canvas id="sensor-chart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
         </div>
     </div>
     
@@ -635,5 +592,182 @@
             });
         });
     </script>
+
+<!-- Add Chart.js from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Existing code remains unchanged
+        
+        // Sensor analytics functionality
+        const timeframeSelect = document.getElementById('timeframe-select');
+        const sensorSummary = document.getElementById('sensor-summary');
+        const sensorChartCanvas = document.getElementById('sensor-chart');
+        
+        let sensorChart = null;
+        
+        // Initial load of sensor data
+        fetchSensorAnalytics();
+        
+        // Set up event listener for timeframe changes
+        timeframeSelect.addEventListener('change', function() {
+            fetchSensorAnalytics();
+        });
+        
+        // Function to fetch sensor analytics data
+        function fetchSensorAnalytics() {
+            const timeframe = timeframeSelect.value;
+            
+            fetch(`/api/sensor_analytics?timeframe=${timeframe}`)
+            .then(response => response.json())
+            .then(data => {
+                updateSensorSummary(data.summary);
+                updateSensorChart(data.time_series);
+            })
+            .catch(error => {
+                console.error('Error fetching sensor analytics:', error);
+                sensorSummary.innerHTML = '<p>Error loading sensor data</p>';
+            });
+        }
+        
+        // Update the sensor summary section
+        function updateSensorSummary(summaryData) {
+            if (!summaryData || summaryData.length === 0) {
+                sensorSummary.innerHTML = '<p>No sensor data available for the selected timeframe</p>';
+                return;
+            }
+            
+            let summaryHTML = '';
+            
+            summaryData.forEach(sensor => {
+                // Format the sensor type for display (e.g., "DIST" -> "Distance")
+                const sensorName = formatSensorName(sensor.reading_type);
+                
+                // Format the values to 2 decimal places
+                const avgValue = parseFloat(sensor.avg_value).toFixed(2);
+                const minValue = parseFloat(sensor.min_value).toFixed(2);
+                const maxValue = parseFloat(sensor.max_value).toFixed(2);
+                
+                summaryHTML += `
+                <div class="sensor-summary-item">
+                    <h4>${sensorName}</h4>
+                    <p>Average: <span>${avgValue}</span></p>
+                    <p>Minimum: <span>${minValue}</span></p>
+                    <p>Maximum: <span>${maxValue}</span></p>
+                    <p>Readings: <span>${sensor.reading_count}</span></p>
+                </div>
+                `;
+            });
+            
+            sensorSummary.innerHTML = summaryHTML;
+        }
+        
+        // Update the sensor chart
+        function updateSensorChart(timeSeriesData) {
+            if (!timeSeriesData || timeSeriesData.length === 0) {
+                return;
+            }
+            
+            // Group data by sensor type
+            const sensorTypes = [...new Set(timeSeriesData.map(item => item.reading_type))];
+            const datasets = [];
+            const timeLabels = [...new Set(timeSeriesData.map(item => item.hour_bucket))];
+            
+            // Create a dataset for each sensor type
+            sensorTypes.forEach((sensorType, index) => {
+                const sensorData = timeSeriesData.filter(item => item.reading_type === sensorType);
+                
+                // Map the data to match the time labels
+                const data = timeLabels.map(timeLabel => {
+                    const match = sensorData.find(item => item.hour_bucket === timeLabel);
+                    return match ? parseFloat(match.avg_value) : null;
+                });
+                
+                // Get a color for the dataset
+                const colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6'];
+                const color = colors[index % colors.length];
+                
+                datasets.push({
+                    label: formatSensorName(sensorType),
+                    data: data,
+                    borderColor: color,
+                    backgroundColor: color + '20', // Add transparency
+                    tension: 0.3,
+                    pointRadius: 3,
+                    fill: true
+                });
+            });
+            
+            // Destroy existing chart if it exists
+            if (sensorChart) {
+                sensorChart.destroy();
+            }
+            
+            // Format time labels
+            const formattedLabels = timeLabels.map(timeLabel => {
+                const date = new Date(timeLabel);
+                return date.toLocaleString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric', 
+                    hour: 'numeric',
+                    hour12: true
+                });
+            });
+            
+            // Create new chart
+            sensorChart = new Chart(sensorChartCanvas, {
+                type: 'line',
+                data: {
+                    labels: formattedLabels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Sensor Value'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Helper function to format sensor names for display
+        function formatSensorName(sensorType) {
+            const sensorNames = {
+                'DIST': 'Distance (cm)',
+                'LIGHT': 'Light Level',
+                'TEMP': 'Temperature (°C)',
+                'HUMID': 'Humidity (%)'
+            };
+            
+            return sensorNames[sensorType] || sensorType;
+        }
+        
+        // Refresh sensor analytics periodically
+        setInterval(fetchSensorAnalytics, 60000); // Refresh every minute
+    });
+</script>
 </body>
 </html>
