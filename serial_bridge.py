@@ -126,37 +126,64 @@ def read_from_arduino():
 
 
 def update_sensor_data(sensor_data):
-    """Parse sensor data and update in database if needed"""
-    if not sensor_data.startswith("SENSORS:"):
-        return
-    
-    # Parse sensor data format: "SENSORS:DIST=20;LIGHT=300"
-    try:
-        data_parts = sensor_data[8:].split(';')  # Remove "SENSORS:" prefix
-        parsed_data = {}
+    """Parse sensor data and update in database"""
+    # Handle both formats: direct "SENSORS:..." and "Sending: SENSORS:..."
+    if "SENSORS:" in sensor_data:
+        # Extract the part after "SENSORS:"
+        sensors_part = sensor_data.split("SENSORS:")[1]
         
-        for part in data_parts:
-            if '=' in part:
-                key, value = part.split('=')
-                parsed_data[key] = value
-        
-        # Log the sensor values
-        logger.info(f"Received sensor data: {parsed_data}")
-        
-        # Here you could update the database with sensor values if needed
-        # For now, we'll just log them
-    except Exception as e:
-        logger.error(f"Error parsing sensor data: {e}")
-
+        # Parse sensor data format: "DIST=20;LIGHT=300"
+        try:
+            data_parts = sensors_part.split(';')
+            parsed_data = {}
+            
+            for part in data_parts:
+                if '=' in part:
+                    key, value = part.split('=')
+                    parsed_data[key] = value
+            
+            # Log the sensor values
+            logger.info(f"Received sensor data: {parsed_data}")
+            
+            # Store sensor data in the database
+            conn = get_db_connection()
+            if conn:
+                cursor = conn.cursor()
+                
+                # Insert each sensor reading as a separate row
+                for sensor_type, sensor_value in parsed_data.items():
+                    try:
+                        # Convert the sensor value to float
+                        float_value = float(sensor_value)
+                        
+                        cursor.execute(
+                            "INSERT INTO sensor_readings (reading_type, reading_value) VALUES (%s, %s)",
+                            (sensor_type, float_value)
+                        )
+                    except ValueError:
+                        logger.warning(f"Could not convert sensor value to float: {sensor_type}={sensor_value}")
+                
+                conn.commit()
+                cursor.close()
+                conn.close()
+                logger.info(f"Successfully saved sensor data to database")
+                
+        except Exception as e:
+            logger.error(f"Error parsing sensor data: {e}")
+    else:
+        logger.warning(f"Received data does not contain SENSORS format: {sensor_data}")
 
 def handle_status_update(status_message):
     """Handle status update from Arduino"""
-    if not status_message.startswith("STATUS:"):
+    if "STATUS:" not in status_message:
         return
     
-    # Parse status update format: "STATUS:DRIVE=stop;REASON=obstacle"
+    # Extract the part after "STATUS:"
+    status_part = status_message.split("STATUS:")[1]
+    
+    # Parse status update format: "DRIVE=stop;REASON=obstacle"
     try:
-        parts = status_message[7:].split(';')  # Remove "STATUS:" prefix
+        parts = status_part.split(';')
         updates = {}
         
         for part in parts:
@@ -179,8 +206,7 @@ def handle_status_update(status_message):
                 logger.info(f"Updated database with Arduino status: drive_motor = {updates['DRIVE']}")
     except Exception as e:
         logger.error(f"Error handling status update: {e}")
-
-
+        
 def process_control_changes(new_values):
     """Process any changes in control values and send to Arduino"""
     global last_control_values
@@ -227,119 +253,6 @@ def signal_handler(sig, frame):
     sys.exit(0)
 
 
-def main():
-    """Main function to run the serial bridge"""
-    global running
-    
-    logger.info("Starting serial bridge between database and Arduino")
-    
-    # Register signal handlers
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
-    
-    # Connect to Arduino
-    if not connect_to_arduino():
-        logger.error(f"Could not connect to Arduino on {SERIAL_PORT}. Check connection and try again.")
-        return
-    
-    # Send initial command to request control values from Arduino
-    send_to_arduino("GET_ALL")
-    
-    poll_counter = 0
-    
-    # Main loop
-    while running:
-        try:
-            # Every 10th iteration (approximately every second), check database for updates
-            if poll_counter % 10 == 0:
-                new_control_values = read_control_values()
-                process_control_changes(new_control_values)
-            
-            # Read from Arduino
-            response = read_from_arduino()
-            if response:
-                logger.info(f"Received from Arduino: {response}")
-                
-                # Process sensor data
-                if response.startswith("SENSORS:"):
-                    update_sensor_data(response)
-                
-                # Process status updates
-                elif response.startswith("STATUS:"):
-                    handle_status_update(response)
-                
-                # Process other responses
-                elif response.startswith("REQUEST:"):
-                    # Arduino is requesting data
-                    if response == "REQUEST:CONTROLS":
-                        control_values = read_control_values()
-                        if control_values:
-                            for name, value in control_values.items():
-                                if name == 'drive_motor':
-                                    send_to_arduino(f"DRIVE:{value}")
-                                elif name == 'steering':
-                                    send_to_arduino(f"STEER:{value}")
-                                elif name == 'headlights':
-                                    send_to_arduino(f"LIGHTS:{value}")
-                                elif name == 'lcd_message':
-                                    send_to_arduino(f"LCD:{value}")
-            
-            # Wait a short time
-            time.sleep(0.1)
-            poll_counter += 1
-            if poll_counter > 100:
-                poll_counter = 0
-                
-        except Exception as e:
-            logger.error(f"Unexpected error in main loop: {e}")
-            time.sleep(1)  # Prevent tight error loop
-
-
-#SENSORRRR
-def update_sensor_data(sensor_data):
-    """Parse sensor data and update in database"""
-    if not sensor_data.startswith("SENSORS:"):
-        return
-    
-    # Parse sensor data format: "SENSORS:DIST=20;LIGHT=300"
-    try:
-        data_parts = sensor_data[8:].split(';')  # Remove "SENSORS:" prefix
-        parsed_data = {}
-        
-        for part in data_parts:
-            if '=' in part:
-                key, value = part.split('=')
-                parsed_data[key] = value
-        
-        # Log the sensor values
-        logger.info(f"Received sensor data: {parsed_data}")
-        
-        # Store sensor data in the database
-        conn = get_db_connection()
-        if conn:
-            cursor = conn.cursor()
-            
-            # Insert each sensor reading as a separate row
-            for sensor_type, sensor_value in parsed_data.items():
-                try:
-                    # Convert the sensor value to float
-                    float_value = float(sensor_value)
-                    
-                    cursor.execute(
-                        "INSERT INTO sensor_readings (reading_type, reading_value) VALUES (%s, %s)",
-                        (sensor_type, float_value)
-                    )
-                except ValueError:
-                    logger.warning(f"Could not convert sensor value to float: {sensor_type}={sensor_value}")
-            
-            conn.commit()
-            cursor.close()
-            conn.close()
-            
-    except Exception as e:
-        logger.error(f"Error parsing sensor data: {e}")
-
-# You'll also need to add a function to get sensor analytics for the dashboard
 def get_sensor_analytics(timeframe='24h'):
     """
     Get sensor analytics for the dashboard
@@ -430,6 +343,72 @@ def get_sensor_analytics(timeframe='24h'):
         if conn:
             conn.close()
         return None
+def main():
+    """Main function to run the serial bridge"""
+    global running
+    
+    logger.info("Starting serial bridge between database and Arduino")
+    
+    # Register signal handlers
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    
+    # Connect to Arduino
+    if not connect_to_arduino():
+        logger.error(f"Could not connect to Arduino on {SERIAL_PORT}. Check connection and try again.")
+        return
+    
+    # Send initial command to request control values from Arduino
+    send_to_arduino("GET_ALL")
+    
+    poll_counter = 0
+    
+    # Main loop
+    while running:
+        try:
+            # Every 10th iteration (approximately every second), check database for updates
+            if poll_counter % 10 == 0:
+                new_control_values = read_control_values()
+                process_control_changes(new_control_values)
+            
+            # Read from Arduino
+            response = read_from_arduino()
+            if response:
+                logger.info(f"Received from Arduino: {response}")
+                
+                # Process sensor data - check if "SENSORS:" is in the response, not just at the beginning
+                if "SENSORS:" in response:
+                    update_sensor_data(response)
+                
+                # Process status updates - check if "STATUS:" is in the response, not just at the beginning
+                elif "STATUS:" in response:
+                    handle_status_update(response)
+                
+                # Process other responses - check if "REQUEST:" is in the response, not just at the beginning
+                elif "REQUEST:" in response:
+                    # Arduino is requesting data
+                    if "REQUEST:CONTROLS" in response:
+                        control_values = read_control_values()
+                        if control_values:
+                            for name, value in control_values.items():
+                                if name == 'drive_motor':
+                                    send_to_arduino(f"DRIVE:{value}")
+                                elif name == 'steering':
+                                    send_to_arduino(f"STEER:{value}")
+                                elif name == 'headlights':
+                                    send_to_arduino(f"LIGHTS:{value}")
+                                elif name == 'lcd_message':
+                                    send_to_arduino(f"LCD:{value}")
+            
+            # Wait a short time
+            time.sleep(0.1)
+            poll_counter += 1
+            if poll_counter > 100:
+                poll_counter = 0
+                
+        except Exception as e:
+            logger.error(f"Unexpected error in main loop: {e}")
+            time.sleep(1)  # Prevent tight error loop
 
 if __name__ == "__main__":
     main()
